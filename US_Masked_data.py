@@ -69,6 +69,10 @@ def get_polygon_from_division(division):
 states = ['MT', 'WY', 'ND', 'SD', 'NE']  # States in the North Great Plains
 ngp_divisions = [f"{state}_CD{num}" for state in states for num in range(1, 11)]
 
+#%%
+states = SGP  #  change the state name here to obtain area of interest
+ngp_divisions = [f"{state}_CD{num}" for state in states for num in range(1, 11)]
+
 # Extract polygons and combine into a single MultiPolygon
 polygons = [get_polygon_from_division(climdiv_polygons[div]) for div in ngp_divisions if div in climdiv_polygons.data_vars]
 combined_polygon = unary_union(polygons)
