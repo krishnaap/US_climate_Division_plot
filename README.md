@@ -1,5 +1,5 @@
 # US_climate_Division_plot
-Python script for plotting US Climate divisions. This is based on NOAA/NCEI U.S. Climate Division Data obtained from https://psl.noaa.gov/data/usclimdivs
+Python script for plotting US Climate divisions. This is based on NOAA/NCEI U.S. Climate Division Data obtained from https://psl.noaa.gov/data/usclimdivs . This script imports US climate divisions from the netCDF file and subset North Great Plains then mask Era 5 data in that particular region. Then make a time series plot.
 
 
 
