@@ -14,11 +14,49 @@ from shapely.geometry import Polygon, MultiPolygon, Point
 from shapely.ops import unary_union
 import numpy as np
 import cartopy.feature as cfeature
+import sys
+
 
 
 # Load the datasets
-era5_data = xr.open_dataset('/media/krishna/Media1/tmp/US_airtemp_era5.nc')
-climdiv_polygons = xr.open_dataset('/media/krishna/Media1/tmp/climdiv_polygons.nc')
+era5_data = xr.open_dataset('./data/US_airtemp_era5.nc')
+climdiv_polygons = xr.open_dataset('./data/climdiv_polygons.nc')
+
+# =============================================================================
+# Plot different Climate divisions based on the State and region
+# https://psl.noaa.gov/data/usclimdivs/descript.html
+# =============================================================================
+
+def get_polygon_from_division(division):
+    latitudes = division.attrs['lat']
+    longitudes = division.attrs['lon']
+    return Polygon(zip(longitudes, latitudes))
+
+fig, ax = plt.subplots(figsize=(10, 8), subplot_kw={'projection': ccrs.LambertConformal()})
+ax.set_extent([-122, -68, 25, 50], crs=ccrs.PlateCarree())
+
+ax.add_feature(cfeature.LAND)
+ax.add_feature(cfeature.COASTLINE, linewidth = 1)
+ax.add_feature(cfeature.BORDERS, linestyle='-', linewidth = 1)
+ax.add_feature(cfeature.STATES, linestyle=':', linewidth = 0.3)
+ax.add_feature(cfeature.OCEAN, facecolor='lightblue')
+
+NGP = ['MT', 'WY', 'ND', 'SD', 'NE']                                            #North Great Plains
+SGP = ['CO', 'NM', 'KS', 'TX', 'OK']                                            #South Great Plains
+MW = ['MN', 'IA', 'MO', 'IL', 'WI', 'MI', 'IN', 'OH', 'KY']                     #MidWest
+SE = ['AR', 'LA', 'AL', 'FL', 'GA', 'MS', 'NC', 'SC', 'TN']                     #Southeast
+NE = ['VA', 'WV', 'PA', 'MD', 'DE', 'NJ', 'NY', 'CT', 'RI', 'MA', 'NH', 'VT', 'ME'] #Northeast
+
+regions = [NGP, SGP, MW, SE, NE]
+
+for region in regions:
+    clim_divisions = [f"{state}_CD{num}" for state in region for num in range(1, 11)]
+    polygons = [get_polygon_from_division(climdiv_polygons[div]) for div in clim_divisions if div in climdiv_polygons.data_vars]
+    combined_polygon = unary_union(polygons)
+
+    ax.add_geometries([combined_polygon], ccrs.PlateCarree(), facecolor='none', edgecolor='blue', linewidth=2)
+
+plt.show()
 #%%
 
 # Define the function to create polygons from division data
